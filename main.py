@@ -18,6 +18,7 @@ else:
 st.set_page_config(page_title="Reclutador Pro v2026", layout="centered")
 
 st.title("🤖 Reclutador Inteligente")
+st.markdown("By Maomeno")
 
 with st.form("search_form"):
     puesto = st.text_input("¿Qué perfil buscas?", placeholder="Ej: Especialista en Ciberseguridad")
