@@ -60,7 +60,7 @@ if submit:
         with st.spinner("Consultando datos..."):
             try:
                 # Usamos el modelo que aparece en tu lista (índice 16)
-                model = genai.GenerativeModel('Gemini 2.5 Flash-Lite')
+                model = genai.GenerativeModel('gemini 2.5 Flash-Lite')
                 response = model.generate_content(prompt_texto)
                 
                 query_final = response.text.strip().replace("`", "")
