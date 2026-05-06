@@ -67,7 +67,9 @@ if submit:
                 
                 # Limpiar cualquier residuo de texto que no sea la query
                 if "site:linkedin.com/in/" in query_final:
-                    url_google = f"https://www.google.com/search?q={urllib.parse.quote(query_final)}"
+                    requisitos_url = urllib.parse.quote(f"{puesto}|{ubicacion}|{skills}")
+                    url_google = f"https://www.google.com/search?q={urllib.parse.quote(query_final)}&reclutador_pro={requisitos_url}"
+                    # url_google = f"https://www.google.com/search?q={urllib.parse.quote(query_final)}"
                     webbrowser.open_new_tab(url_google)
                     st.success("¡Búsqueda generada con éxito!")
                     st.code(query_final, language="text")
