@@ -71,6 +71,7 @@ if submit:
                     webbrowser.open_new_tab(url_google)
                     st.success("¡Búsqueda generada con éxito!")
                     st.code(query_final, language="text")
+                    st.link_button("VER CANDIDATOS", url_google, type="primary", use_container_width=True)
                 else:
                     st.warning("Se generó una respuesta inesperada. Intenta ser más específico.")
                     st.write(query_final) # Para ver qué respondió la IA
