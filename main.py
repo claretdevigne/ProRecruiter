@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 import google.generativeai as genai
 import urllib.parse
@@ -15,9 +16,9 @@ if API_KEY:
 else:
   st.error("No se encontró la Api Key de Google.")
   
-st.set_page_config(page_title="Reclutador Pro v2026", layout="centered")
+st.set_page_config(page_title="Pro Recruiter v2026", layout="centered")
 
-st.title("🤖 Reclutador Inteligente")
+st.title("🤖 Pro Recruiter")
 st.markdown("By Maomeno")
 
 with st.form("search_form"):
@@ -38,23 +39,30 @@ if submit:
     else:
         # Prompt optimizado para la serie Gemini 3
         prompt_texto = f"""
-        Actúa como un experto en Sourcing. Crea una query de Google (X-Ray) para perfiles de LinkedIn.
-        
-        CRITERIOS:
+        Actúa como un experto en Sourcing y análisis de datos.
+        Analiza los siguientes parámetros de búsqueda:
         - Puesto: {puesto}
         - Skills: {skills}
         - Ubicación: {ubicacion}
         - Mínimo de experiencia: {experiencia} años
         - Job Description proporcionada: {jd if jd else "N/A"}
         
-        REGLAS:
-        1. Empieza con site:linkedin.com/in/
-        2. Si hay una Job Description, analiza los requisitos clave y mézclalos con el puesto y skills para crear una query robusta.
-        3. Si la experiencia es > 0, intenta incluir términos como "{experiencia}..15 years" o variaciones que sugieran antigüedad o términos como "Senior" o "Lead".
-        4. Si la experienca es 0 no añadas filtros de años. 
-        5. Usa operadores booleanos (AND, OR, NOT) y comillas para términos exactos. 
-        6. Usa sinónimos en español e inglés.
-        7. Devuelve ÚNICAMENTE la cadena de búsqueda.
+        TAREAS:
+        1. Genera una query X-Ray robusta para Linkedin que empiece con site:linkedin.com/in/
+        2. Identifica la región, estado o departamento de la ubicación original y devuelvemela en una lista
+        3. Extrae las 5-7 skills más críticas (normalizadas) basadas en el puesto y la JD.
+        4. Si hay una Job Description, analiza los requisitos clave y mézclalos con el puesto y skills para crear una query robusta.
+        5. Si la experiencia es > 0, intenta incluir términos como "{experiencia}..15 years" o variaciones que sugieran antigüedad o términos como "Senior" o "Lead".
+        6. Si la experienca es 0 no añadas filtros de años. 
+        7. Usa operadores booleanos (AND, OR, NOT) y comillas para términos exactos. 
+        8. Usa sinónimos en español e inglés.
+        
+        Devuelve ÚNICAMENTE UN OBJETO JSON con este formato:
+        {{
+          "google_query": "la cadena de búsqueda aquí",
+          "ubicaciones_expandidas": ["Ciudad", "Estado/Departamento", "País"],
+          "skills_extraidas": ["skill1", "skill2", "skill3"]
+          }}.
         """
         
         with st.spinner("Consultando datos..."):
@@ -64,21 +72,38 @@ if submit:
                 response = model.generate_content(prompt_texto)
                 
                 query_final = response.text.strip().replace("`", "")
+
+                # 1. Limpieza profesional de JSON (maneja los ```json del modelo)
+                raw_text = response.text.strip()
+                if "```" in raw_text:
+                    raw_text = raw_text.split("```")[1].replace("json", "").strip()
+                
+                data_json = json.loads(raw_text)
+
+                query_final = data_json.get("google_query", "")
+                # Usamos los datos enriquecidos por la IA para la extensión
+                lista_ubicaciones = data_json.get("ubicaciones_expandidas", [])
+                lista_skills = data_json.get("skills_extraidas", [])
+
+                except Exception as e:
+                st.error(f"Error al decodificar JSON: {e}")
                 
                 # Limpiar cualquier residuo de texto que no sea la query
                 if "site:linkedin.com/in/" in query_final:
-                    requisitos_url = urllib.parse.quote(f"{puesto}|{ubicacion}|{skills}")
-                    url_google = f"https://www.google.com/search?q={urllib.parse.quote(query_final)}&reclutador_pro={requisitos_url}"
-                    # url_google = f"https://www.google.com/search?q={urllib.parse.quote(query_final)}"
-                    webbrowser.open_new_tab(url_google)
+                    # 2. Pasamos los datos ENRIQUECIDOS a la URL
+                    metadatos = {
+                      "puesto": puesto,
+                      "ubicacion": ", ".join(lista_ubicaciones), # Ahora incluye Antioquia, etc.
+                      "skills": ", ".join(lista_skills),        # Ahora incluye sinónimos de la IA
+                      "reclutador_pro": "true"
+                    }
+                    
+                    params_extension = urllib.parse.urlencode(metadatos)
+                    query_encoded = urllib.parse.quote(query_final)
+                    url_google = f"https://www.google.com/search?q={query_encoded}&{params_extension}"
+                    
                     st.success("¡Búsqueda generada con éxito!")
-                    st.code(query_final, language="text")
+                    st.code(query_encoded, language="text")
                     st.link_button("VER CANDIDATOS", url_google, type="primary", use_container_width=True)
-                else:
-                    st.warning("Se generó una respuesta inesperada. Intenta ser más específico.")
-                    st.write(query_final) # Para ver qué respondió la IA
-                
-            except Exception as e:
-                st.error(f"Error técnico con el modelo de IA: {e}")
 
 st.divider()
