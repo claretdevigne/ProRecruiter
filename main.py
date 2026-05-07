@@ -2,7 +2,10 @@ import streamlit as st
 import urllib.parse
 
 # INICIA APP
-st.set_page_config(page_title="Pro Recruiter v2026", layout="centered")
+st.set_page_config(
+    page_title="Pro Recruiter v2026", 
+    page_icon="🕵️",
+    layout="centered")
 
 st.title("Pro Recruiter")
 st.markdown("By Maomeno")
