@@ -2,10 +2,8 @@ import json
 import streamlit as st
 import google.generativeai as genai
 import urllib.parse
-import webbrowser
 
 # --- CONFIGURACIÓN ---
-# Asegúrate de que esta API Key sea la misma que usaste para listar los modelos
 if "GOOGLE_API_KEY" in st.secrets:
   API_KEY = st.secrets["GOOGLE_API_KEY"]
 else:
@@ -15,7 +13,8 @@ if API_KEY:
   genai.configure(api_key=API_KEY)
 else:
   st.error("No se encontró la Api Key de Google.")
-  
+
+# INICIA APP
 st.set_page_config(page_title="Pro Recruiter v2026", layout="centered")
 
 st.title("🤖 Pro Recruiter")
@@ -67,29 +66,25 @@ if submit:
         
         with st.spinner("Consultando datos..."):
             try:
-                # Usamos el modelo que aparece en tu lista (índice 16)
                 model = genai.GenerativeModel('gemini-2.5-flash-lite')
                 response = model.generate_content(prompt_texto)
                 
-                query_final = response.text.strip().replace("`", "")
-
                 # 1. Limpieza profesional de JSON (maneja los ```json del modelo)
                 raw_text = response.text.strip()
                 if "```" in raw_text:
                     raw_text = raw_text.split("```")[1].replace("json", "").strip()
                 
                 data_json = json.loads(raw_text)
-
+                
                 query_final = data_json.get("google_query", "")
                 # Usamos los datos enriquecidos por la IA para la extensión
                 lista_ubicaciones = data_json.get("ubicaciones_expandidas", [])
                 lista_skills = data_json.get("skills_extraidas", [])
 
             except Exception as e:
-                st.error(f"Error al decodificar JSON: {e}")
+              st.error(f"Error al decodificar JSON: {e}")
                 
-                # Limpiar cualquier residuo de texto que no sea la query
-                if "site:linkedin.com/in/" in query_final:
+            if "site:linkedin.com/in/" in query_final:
                     # 2. Pasamos los datos ENRIQUECIDOS a la URL
                     metadatos = {
                       "puesto": puesto,
