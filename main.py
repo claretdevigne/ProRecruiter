@@ -85,7 +85,7 @@ if submit:
                 lista_ubicaciones = data_json.get("ubicaciones_expandidas", [])
                 lista_skills = data_json.get("skills_extraidas", [])
 
-                except Exception as e:
+            except Exception as e:
                 st.error(f"Error al decodificar JSON: {e}")
                 
                 # Limpiar cualquier residuo de texto que no sea la query
