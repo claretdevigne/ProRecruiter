@@ -80,7 +80,7 @@ if submit:
                 if "site:linkedin.com/in/" in query_final:
                     query_encode = urllib.parse.quote(query_final)
                     params_extension = urllib.parse.urlencode(metadatos)
-                    url_google = f"https://www.google.com/search?q={query_final}&{params_extension}"
+                    url_google = f"https://www.google.com/search?q={query_final}&{params_extension}&udm=14"
                     
                     st.success("¡Búsqueda generada con éxito!")
                     st.code(query_final, language="text")
