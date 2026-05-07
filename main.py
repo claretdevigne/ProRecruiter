@@ -98,7 +98,7 @@ if submit:
                     url_google = f"https://www.google.com/search?q={query_encoded}&{params_extension}"
                     
                     st.success("¡Búsqueda generada con éxito!")
-                    st.code(query_encoded, language="text")
+                    # st.code(query_encoded, language="text")
                     st.link_button("VER CANDIDATOS", url_google, type="primary", use_container_width=True)
 
 st.divider()
