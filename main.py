@@ -74,7 +74,7 @@ if submit:
                 metadatos = {
                   "puesto": puesto,
                   "skills": keywords,
-                  "ubicación": ubicacion,
+                  "ubicacion": ubicacion,
                 }
                 
                 if "site:linkedin.com/in/" in query_final:
