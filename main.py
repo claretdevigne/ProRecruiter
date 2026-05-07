@@ -102,3 +102,16 @@ if submit:
                     st.link_button("VER CANDIDATOS", url_google, type="primary", use_container_width=True)
 
 st.divider()
+
+# Opción con link directo y un toque de estilo
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <a href="https://github.com/claretdevigne/ProRecruiterExtension/archive/refs/heads/main.zip" 
+           style="text-decoration: none; color: #27ae60; font-weight: bold; font-size: 18px;">
+           📥 Descargar extensión
+        </a>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
